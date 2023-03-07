@@ -21,15 +21,16 @@ float radio = 0;
 boolean c1 = false;
 boolean c2 = false;
 boolean thetaInicial = true;
-int [][] randomColors = new int[12][];
+float [][] randomColors = new float[12][];
 
 void setup() {
   size(640, 640);
+  colorMode(HSB, 360, 99, 99);
   //noStroke();
   //noFill();
   hint(ENABLE_STROKE_PURE);
   for (int i=0; i<12; i++) {
-    randomColors[i] = new int[] {int(random(0, 256)), int(random(0, 256)), int(random(0, 256))};
+    randomColors[i] = new float[] {int(random(0, 359)), 99, 80};
   }
 
 }
@@ -40,7 +41,7 @@ void draw() {
   for (int i = 0; i < 360; i = i+30) {
     fill(randomColors[i/30][0], randomColors[i/30][1], randomColors[i/30][2]);
     if (circleid1*30 == i && c1==false) {
-      fill(57, color1, color2);
+      //fill(57, color1, color2);
       xPos = 200*cos(i*(PI/180))+300;
       yPos = 200*sin(i*(PI/180))+300;
       circle(xPos, yPos, 30);
@@ -49,11 +50,11 @@ void draw() {
       c1 = true;
     }
     else if (circleid1*30 == i && c1==true) {
-      fill(57, color1, color2);
+      //fill(57, color1, color2);
       circle(xPos, yPos, 30);
     }
     else if (circleid2*30 == i && c2==false) {
-      fill(57, color1, color2);
+      //fill(57, color1, color2);
       xPos2 = 200*cos(i*(PI/180))+300;
       yPos2 = 200*sin(i*(PI/180))+300;
       circle(xPos2, yPos2, 30);
@@ -62,7 +63,7 @@ void draw() {
       c2 = true;
     }
     else if (circleid2*30 == i && c2==true) {
-      fill(57, color1, color2);
+      //fill(57, color1, color2);
       circle(xPos2, yPos2, 30);
     }
     else {
@@ -82,12 +83,12 @@ void draw() {
   noFill();
   
   //filter( DILATE );
-  stroke(255, 255, 255, value);
+  stroke(0, 0, 100, value);
   circle(centroX, centroY, radio*2);
   changeOpacity();
   
   noStroke();
-  fill(57, color1, color2);
+  //fill(57, color1, color2);
   //circle(xPos, yPos, 30);
   //circle(xPos2, yPos2, 30);
   changePos();
