@@ -1,10 +1,14 @@
-int value = 0;
-int change = 5;
+float value = 0;
+float change = 5.66;
 float colorChange = 1;
 float xPos = 224;
 float yPos = 184-110;
-float theta = 3*PI/2;
+float theta = 0;
 float anguloInicial = 0;
+float xInicial;
+float yInicial;
+float xFinal;
+float yFinal;
 int color1 = 175;
 int color2 = 111;
 float xPos2 = 224;
@@ -16,6 +20,7 @@ float centroY = 0;
 float radio = 0;
 boolean c1 = false;
 boolean c2 = false;
+boolean thetaInicial = true;
 int [][] randomColors = new int[12][];
 
 void setup() {
@@ -39,8 +44,8 @@ void draw() {
       xPos = 200*cos(i*(PI/180))+300;
       yPos = 200*sin(i*(PI/180))+300;
       circle(xPos, yPos, 30);
-
-      //anguloInicial = i*(PI/180);
+      xInicial = xPos;
+      yInicial = yPos;
       c1 = true;
     }
     else if (circleid1*30 == i && c1==true) {
@@ -52,7 +57,8 @@ void draw() {
       xPos2 = 200*cos(i*(PI/180))+300;
       yPos2 = 200*sin(i*(PI/180))+300;
       circle(xPos2, yPos2, 30);
-      
+      xFinal = xPos2;
+      yFinal = yPos2;
       c2 = true;
     }
     else if (circleid2*30 == i && c2==true) {
@@ -66,11 +72,17 @@ void draw() {
   centroX = abs(xPos+xPos2)/2;
   centroY = abs(yPos+yPos2)/2;
   radio = dist(xPos, yPos, xPos2, yPos2)/2;
+  
+  anguloInicial = atan2(-yInicial + centroY, xInicial - centroX);
+  if (thetaInicial == true) {
+    theta = anguloInicial;
+    thetaInicial = false;
+  }
 
   noFill();
   
   //filter( DILATE );
-  stroke(12, 13, 240, value);
+  stroke(255, 255, 255, value);
   circle(centroX, centroY, radio*2);
   changeOpacity();
   
@@ -86,7 +98,7 @@ void changeOpacity() {
   if (value > 255 || value < 0) {
     change *= -1;
   }
-  delay(5);
+  //delay(5);
 }
 
 void changePos() {
@@ -94,17 +106,23 @@ void changePos() {
   yPos = centroY + radio * sin(theta);
   xPos2 = centroX + radio * cos(theta);
   yPos2 = centroY - radio * sin(theta);
-  if (theta >= PI/2) {
+  /*
+  if (xPos == xFinal && yPos == yFinal) {
+    delay(1000);
+  }
+  */
+  if (anguloInicial - theta < PI) {
     theta -= 2*PI/180;
     color1 -= colorChange;
     color2 += colorChange;
   }
   else {
-    //delay(500);
+    delay(50);
     colorChange *= -1;
-    theta = 3*PI/2;
+    //theta = anguloInicial;
+    mouseClicked();
   }
-  delay(5);
+  //delay(5);
 }
 
 void mouseClicked() {
@@ -116,5 +134,6 @@ void mouseClicked() {
   }
   c1 = false;
   c2 = false;
+  thetaInicial = true;
   redraw();
 }
