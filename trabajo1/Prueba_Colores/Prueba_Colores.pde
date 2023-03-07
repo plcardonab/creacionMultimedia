@@ -11,7 +11,7 @@ int num_circles = 2;
 
 // Se inicializan los colores
 
-int saturation = 99;
+int saturation = 60;
 int value = 80;
 
 float [][] colors = new float[num_circles][];
