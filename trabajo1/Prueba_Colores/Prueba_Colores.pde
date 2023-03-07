@@ -11,7 +11,7 @@ int num_circles = 12;
 
 // Se inicializan los colores
 
-int [][] colors = new int[num_circles][];
+float [][] colors = new float[num_circles][];
 
 int colorsIterator = 0;
 
@@ -28,7 +28,7 @@ void setup() {
   size(800, 800, P2D);
   
   for (int i=0; i<num_circles; i++) {
-    colors[i] = new int[] {int(random(0, 256)), int(random(0, 256)), int(random(0, 256))};
+    colors[i] = new float[] {int(random(0, 256)), int(random(0, 256)), int(random(0, 256))};
   }
   
   for(int i=0; i < 360 ; i+= int(360 / num_circles)){
@@ -84,13 +84,13 @@ void draw() {
     CircleItem circle1 = items.get(circleId1);
     CircleItem circle2 = items.get(circleId2);
     
-    circle1.actualizaColor();
-    circle2.actualizaColor();
+    circle1.actualizaColor(circleId1);
+    circle2.actualizaColor(circleId2);
     
     if (circle1.cCheck == false && circle2.cCheck == false){
       
-      println(circleId1, "lo logro", circle1.c[0], circle1.c[1], circle1.c[2], " a esto ", circle1.cEnd[0], circle1.cEnd[1], circle1.cEnd[2]);
-      println(circleId2, "lo logro", circle2.c[0], circle2.c[1], circle2.c[2], " a esto ", circle2.cEnd[0], circle2.cEnd[1], circle2.cEnd[2]);
+      println(circleId1, "lo logro", circle1.cEnd[0], circle1.cEnd[1], circle1.cEnd[2]);
+      println(circleId2, "lo logro", circle2.cEnd[0], circle2.cEnd[1], circle2.cEnd[2]);
       
       cur_rotating = false;
       
@@ -124,15 +124,15 @@ class CircleItem{
   
   public int saltoX = 0;
   public int saltoY = 0;
-  public int saltoR = 0;
-  public int saltoG = 0;
-  public int saltoB = 0;
+  public float saltoR = 0;
+  public float saltoG = 0;
+  public float saltoB = 0;
   
   // Colores
   
-  public int[] c;
-  public int[] cInit;
-  public int[] cEnd;
+  private float[] c;
+  private float[] cInit;
+  private float[] cEnd;
   
   // Comprobante si ya hizo la transicion a color
   
@@ -141,7 +141,7 @@ class CircleItem{
   
   // Para dibujar cada circulo
   
-  public CircleItem(int xPos, int yPos, int[] c){
+  public CircleItem(int xPos, int yPos, float[] c){
     
     this.xPos = xPos;
     this.yPos = yPos;
@@ -158,25 +158,22 @@ class CircleItem{
     
   }
   
-  public void setFinal(int xPos, int yPos, int[] c){
+  public void setFinal(int xPos, int yPos, float[] new_c){
     
    //this.xPosEnd = xPos;
    //this.yPosEnd = yPos;
-   this.cEnd = c;
+   this.cEnd = new_c.clone();
    
    this.cCheck = true;
    
    this.saltoR = (this.cEnd[0] - this.c[0]) / steps;
    this.saltoG = (this.cEnd[1] - this.c[1]) / steps;
-   this.saltoB = (this.cEnd[2] - this.c[2]) / steps;
-   
-   println(this.saltoR, this.saltoG, this.saltoB);
-   
+   this.saltoB = (this.cEnd[2] - this.c[2]) / steps;   
    
   }
   
-  public void actualizaColor(){
-    
+  public void actualizaColor(int id){
+        
     if (this.c[0] != this.cEnd[0]){
       
       if (this.c[0] + this.saltoR > this.cEnd[0]) {
@@ -204,19 +201,7 @@ class CircleItem{
       }
       
     }
-    if (this.c[2] != this.cEnd[2]){
-      
-      if (this.c[2] + this.saltoB > this.cEnd[2]) {
-        this.c[2] = this.cEnd[2];
-      }
-      
-      else {
         
-        this.c[2] += this.saltoB;
-        
-      }
-    }
-    
     if (this.c[0] == this.cEnd[0] && this.c[1] == this.cEnd[1] && this.c[2] == this.cEnd[2]){
       
       this.cCheck = false;
