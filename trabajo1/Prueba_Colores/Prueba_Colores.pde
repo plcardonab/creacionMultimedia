@@ -7,9 +7,12 @@ int circleId2;
 
 // Numero de circulos a dibujar
 
-int num_circles = 12;
+int num_circles = 2;
 
 // Se inicializan los colores
+
+int saturation = 99;
+int value = 80;
 
 float [][] colors = new float[num_circles][];
 
@@ -25,12 +28,16 @@ int steps = 10;
 
 void setup() {
   
+  // Cambio modo de color
+  
+  colorMode(HSB, 360, 99, 99);
+  
   size(800, 800, P2D);
   
   for (int i=0; i<num_circles; i++) {
-    colors[i] = new float[] {int(random(0, 256)), int(random(0, 256)), int(random(0, 256))};
+    colors[i] = new float[] {int(random(0, 359)), saturation, value};
   }
-  
+    
   for(int i=0; i < 360 ; i+= int(360 / num_circles)){
         
     int xPos = int(200*cos(i*(PI/180)));
@@ -40,7 +47,7 @@ void setup() {
     
   }
   
-  frameRate(1);
+  frameRate(10);
 
 }
 
@@ -51,9 +58,7 @@ void draw() {
   translate(width/2, height/2);
   
   if (cur_rotating == false){
-    
-    println("Cambio");
-    
+        
     circleId1 = int(random(0, num_circles));    
     circleId2 = int(random(0, num_circles));
     
@@ -71,10 +76,7 @@ void draw() {
     
     circle1.setFinal(circle2.xPos, circle2.yPos, circle2.c);
     circle2.setFinal(circle1.xPos, circle1.yPos, circle1.c);
-    
-    println("Pasa de esto", circle1.c[0], circle1.c[1], circle1.c[2], " a esto ", circle1.cEnd[0], circle1.cEnd[1], circle1.cEnd[2]);
-    println("Pasa de esto", circle2.c[0], circle2.c[1], circle2.c[2], " a esto ", circle2.cEnd[0], circle2.cEnd[1], circle2.cEnd[2]);
-    
+        
     cur_rotating = true;
     
   }
@@ -88,10 +90,7 @@ void draw() {
     circle2.actualizaColor(circleId2);
     
     if (circle1.cCheck == false && circle2.cCheck == false){
-      
-      println(circleId1, "lo logro", circle1.cEnd[0], circle1.cEnd[1], circle1.cEnd[2]);
-      println(circleId2, "lo logro", circle2.cEnd[0], circle2.cEnd[1], circle2.cEnd[2]);
-      
+            
       cur_rotating = false;
       
     }
@@ -124,14 +123,11 @@ class CircleItem{
   
   public int saltoX = 0;
   public int saltoY = 0;
-  public float saltoR = 0;
-  public float saltoG = 0;
-  public float saltoB = 0;
+  public float saltoC = 0;
   
   // Colores
   
   private float[] c;
-  private float[] cInit;
   private float[] cEnd;
   
   // Comprobante si ya hizo la transicion a color
@@ -166,9 +162,7 @@ class CircleItem{
    
    this.cCheck = true;
    
-   this.saltoR = (this.cEnd[0] - this.c[0]) / steps;
-   this.saltoG = (this.cEnd[1] - this.c[1]) / steps;
-   this.saltoB = (this.cEnd[2] - this.c[2]) / steps;   
+   this.saltoC = (this.cEnd[0] - this.c[0]) / steps;
    
   }
   
@@ -176,39 +170,23 @@ class CircleItem{
         
     if (this.c[0] != this.cEnd[0]){
       
-      if (this.c[0] + this.saltoR > this.cEnd[0]) {
+      if (this.c[0] + this.saltoC > this.cEnd[0]) {
         this.c[0] = this.cEnd[0];
       }
       
       else {
         
-        this.c[0] += this.saltoR;
-        
-      }
-      
-    }
-    
-    if (this.c[1] != this.cEnd[1]){
-      
-      if (this.c[1] + this.saltoG > this.cEnd[1]) {
-        this.c[1] = this.cEnd[1];
-      }
-      
-      else {
-        
-        this.c[1] += this.saltoG;
+        this.c[0] += this.saltoC;
         
       }
       
     }
         
-    if (this.c[0] == this.cEnd[0] && this.c[1] == this.cEnd[1] && this.c[2] == this.cEnd[2]){
+    if (this.c[0] == this.cEnd[0]){
       
       this.cCheck = false;
       
-      this.saltoR = 0;
-      this.saltoG = 0;
-      this.saltoB = 0;
+      this.saltoC = 0;
       
       //this.cEnd = this.c;
       
