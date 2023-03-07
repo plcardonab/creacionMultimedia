@@ -74,7 +74,10 @@ void draw() {
   radio = dist(xPos, yPos, xPos2, yPos2)/2;
   
   anguloInicial = atan2(-yInicial + centroY, xInicial - centroX);
-
+  if (thetaInicial == true) {
+    theta = anguloInicial;
+    thetaInicial = false;
+  }
 
   noFill();
   
@@ -116,7 +119,7 @@ void changePos() {
   else {
     delay(50);
     colorChange *= -1;
-    theta = anguloInicial;
+    //theta = anguloInicial;
     mouseClicked();
   }
   //delay(5);
@@ -131,5 +134,6 @@ void mouseClicked() {
   }
   c1 = false;
   c2 = false;
+  thetaInicial = true;
   redraw();
 }
