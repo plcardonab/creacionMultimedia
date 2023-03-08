@@ -5,14 +5,19 @@ boolean cur_rotating = false;
 int circleId1;
 int circleId2;
 
+// Par de círculos que rotó anteriormente
+
+int prevCircleId1;
+int prevCircleId2;
+
 // Numero de circulos a dibujar
 
-int num_circles = 2;
+int num_circles = 12;
 
 // Se inicializan los colores
 
 int saturation = 60;
-int value = 80;
+int brightness = 80;
 
 float [][] colors = new float[num_circles][];
 
@@ -22,76 +27,137 @@ int colorsIterator = 0;
 
 ArrayList <CircleItem> items = new ArrayList <CircleItem> ();
 
+// Se crea la lista donde se guardaran las orbitas
+
+ArrayList <OrbitItem> orbitItems = new ArrayList <OrbitItem> ();
+
 // Numero de pasos para dar la vuelta para cada par de circulos
 
-int steps = 10;
+int steps = 180;
+
+// Velocidad de movimiento
+
+float speed = 0;
+
+// Parametros para la circunferencia que se dibuja al fondo
+
+float centroX = 0;
+float centroY = 0;
+float diametro = 0;
 
 void setup() {
   
   // Cambio modo de color
   
-  colorMode(HSB, 360, 99, 99);
+  colorMode(HSB, 360, 100, 100);
   
   size(800, 800, P2D);
   
-  for (int i=0; i<num_circles; i++) {
-    colors[i] = new float[] {int(random(0, 359)), saturation, value};
+  // Creacion de los colores
+  
+  for (int i=0; i < num_circles; i++) {
+    colors[i] = new float[] {int(random(0, 359)), saturation, brightness};
   }
-    
-  for(int i=0; i < 360 ; i+= int(360 / num_circles)){
-        
+  
+  // Creacion circulos
+  
+  for(int i=0; i < 360 ; i += int(360/num_circles)){
+            
     int xPos = int(200*cos(i*(PI/180)));
     int yPos = int(200*sin(i*(PI/180)));
+    
     CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]);
+    
     colorsIterator++;
     
   }
-  
-  frameRate(10);
-
 }
 
 void draw() {
   
   background(0);
   
+  // Parte del centro
+  
   translate(width/2, height/2);
   
+  // Si no hay nada rotando actualmente
+  
   if (cur_rotating == false){
+    
+    // Escoge que par de circulos van a rotar
         
-    circleId1 = int(random(0, num_circles));    
+    circleId1 = int(random(0, num_circles));
     circleId2 = int(random(0, num_circles));
-    
-    //circleId1 = 0;
-    //circleId2 = 1;
-    
-    while (circleId2 == circleId1){
+        
+    while (
+        // Si son el mismo
+        circleId2 == circleId1
+        // O si son los opuestos
+        //|| (num_circles%2 == 0 && num_circles != 2 && abs(circleId1-circleId2) == int(num_circles/2))
+        // O si son el par anterior
+        || ((circleId1 == prevCircleId1 && circleId2 == prevCircleId2) || (circleId1 == prevCircleId2 && circleId2 == prevCircleId1))
+      ){
       
+      circleId1 = int(random(0, num_circles));
       circleId2 = int(random(0, num_circles));
       
     }
     
+    speed = random(0.5, 4);
+    
+    println(speed);
+    
     CircleItem circle1 = items.get(circleId1);
     CircleItem circle2 = items.get(circleId2);
     
-    circle1.setFinal(circle2.xPos, circle2.yPos, circle2.c);
-    circle2.setFinal(circle1.xPos, circle1.yPos, circle1.c);
+    // Asigna el centro y diametro de la orbita en la que van a rotar
+            
+    centroX = (circle1.xPos + circle2.xPos)/2;
+    centroY = (circle1.yPos + circle2.yPos)/2;
+    diametro = dist(circle1.xPos, circle1.yPos, circle2.xPos, circle2.yPos);
+    
+    // Asigna el tono promedio entre los dos circulos
+    
+    float hue = (circle1.c[0] + circle2.c[0]) / 2;
+    
+    // Crea la orbita
+    
+    OrbitItem orbit = new OrbitItem(centroX, centroY, diametro, hue);
+    
+    circle1.setFinal(centroX, centroY, circle2.c);
+    circle2.setFinal(centroX, centroY, circle1.c);
+    
+    // Activa la rotacion
         
     cur_rotating = true;
     
   }
+  
+  // Cuando haya rotacion
   
   if (cur_rotating == true){
     
     CircleItem circle1 = items.get(circleId1);
     CircleItem circle2 = items.get(circleId2);
     
-    circle1.actualizaColor(circleId1);
-    circle2.actualizaColor(circleId2);
+    // Actualiza los circulos
     
-    if (circle1.cCheck == false && circle2.cCheck == false){
+    circle1.actualiza();
+    circle2.actualiza();
+    
+    // Si ya termino la rotacion, escoge otro par de circulos
+    
+    if (circle1.check == false && circle2.check == false){
+      
+      prevCircleId1 = circleId1;
+      prevCircleId2 = circleId2;
             
       cur_rotating = false;
+      
+      // Elimina la orbita
+      
+      orbitItems.remove(orbitItems.size()-1);
       
     }
     
@@ -102,43 +168,50 @@ void draw() {
     item.display();
     
   }
+  
+  for (OrbitItem item : orbitItems){
+    
+    item.display();
+    
+  }
 }
 
 class CircleItem{
+    
+  // Contador pasos
   
-    // Posicion actual
+  public int counter = 0;
+  
+  // Posicion actual
   public int xPos = 0;
   public int yPos = 0;
+    
+  public float angulo = 0;
   
-  // Posicion inicial
-  public int xPosInit = 0;
-  public int yPosInit = 0;
+  // Centro orbita
   
-  // Posicion final
+  public float centroX = 0;
+  public float centroY = 0;
   
-  public int xPosEnd = 0;
-  public int yPosEnd = 0;
+  public float radio = 0;
   
   // Saltos
   
-  public int saltoX = 0;
-  public int saltoY = 0;
-  public float saltoC = 0;
+  public float saltoH = 0;
   
   // Colores
   
   private float[] c;
   private float[] cEnd;
   
-  // Comprobante si ya hizo la transicion a color
+  // Comprobante si ya hizo la transicion
   
-  public boolean cCheck = true;
-  
+  public boolean check = true;  
   
   // Para dibujar cada circulo
   
   public CircleItem(int xPos, int yPos, float[] c){
-    
+        
     this.xPos = xPos;
     this.yPos = yPos;
     this.c = c;
@@ -154,45 +227,108 @@ class CircleItem{
     
   }
   
-  public void setFinal(int xPos, int yPos, float[] new_c){
-    
-   //this.xPosEnd = xPos;
-   //this.yPosEnd = yPos;
+  public void setFinal(float centroX, float centroY, float[] new_c){
+
    this.cEnd = new_c.clone();
    
-   this.cCheck = true;
+   this.centroX = centroX;
+   this.centroY = centroY;
    
-   this.saltoC = (this.cEnd[0] - this.c[0]) / steps;
+   this.angulo = atan2(this.yPos - this.centroY, this.xPos - this.centroX);
+      
+   this.radio = dist(this.xPos, this.yPos, this.centroX, this.centroY);
+   
+   this.check = true;
+   
+   this.saltoH = ((this.cEnd[0] - this.c[0]) / float(steps)) * speed;
    
   }
   
-  public void actualizaColor(int id){
+  public void actualizaColor(){
         
     if (this.c[0] != this.cEnd[0]){
       
-      if (this.c[0] + this.saltoC > this.cEnd[0]) {
+      if (this.c[0] + this.saltoH > this.cEnd[0]) {
         this.c[0] = this.cEnd[0];
       }
       
       else {
         
-        this.c[0] += this.saltoC;
+        this.c[0] += this.saltoH;
         
       }
-      
-    }
-        
-    if (this.c[0] == this.cEnd[0]){
-      
-      this.cCheck = false;
-      
-      this.saltoC = 0;
-      
-      //this.cEnd = this.c;
       
     }
     
   }
   
   // Calcula la pos de X y Y actuales
+  
+  public void actualizaPosicion(){
+    
+    this.angulo += PI/steps;
+            
+    this.xPos = int(this.centroX + this.radio*cos(this.angulo));
+    this.yPos = int(this.centroY + this.radio*sin(this.angulo));
+    
+  }
+  
+  public void actualiza(){
+    
+    this.actualizaColor();
+    this.actualizaPosicion();
+    
+    this.counter ++;
+    
+    if (this.counter == steps){
+            
+      this.counter = 0;
+      
+      this.check = false;
+      
+    }
+    
+  }
+  
+}
+
+public class OrbitItem{
+  
+  public float centroX = 0;
+  public float centroY = 0;
+  public float radio = 0;
+  
+  public float hue = 0;
+  
+  public float saltoS = 0;
+  
+  public float sat = 0;
+    
+  public OrbitItem(float centroX, float centroY, float radio, float hue){
+    
+    this.centroX = centroX;
+    this.centroY = centroY;
+    this.radio = radio;
+    
+    this.hue = hue;
+    
+    this.saltoS = (float(saturation) / float(steps)) * speed;
+    
+    orbitItems.add(this);
+    
+  }
+  
+  public void display(){
+    
+    this.sat += this.saltoS;
+        
+    strokeWeight(3);
+    stroke(this.hue, this.sat, brightness);
+    noFill();
+        
+    circle(centroX, centroY, radio);
+    
+    noStroke();
+  
+  }
 }
