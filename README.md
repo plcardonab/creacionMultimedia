@@ -3,7 +3,7 @@
 
 Integrantes:
 - Esteban Rojas Henao
-- 
+- Juan Sebastian Patiño
 - Pedro Luis Cardona Buenaventura
 - Wilmar Andrés García Bedoya
 
@@ -14,4 +14,5 @@ El proyecto fue inspirado por la siguiente imagen, creada por el artista Dave Wh
 
 ## Video
 En el video a continuación se presenta el resultado final del proyecto:  
-**insertar video aquí**
+
+https://user-images.githubusercontent.com/55595765/223612170-a6dd8c0b-993b-47e2-89b2-2f785ee03b79.mp4
