@@ -89,7 +89,7 @@ void setup() {
     
   }
   
-  frameRate(1000);
+  frameRate(100);
 }
 
 void draw() {
@@ -143,6 +143,19 @@ void draw() {
     CircleItem circle1 = items.get(circleId1);
     CircleItem circle2 = items.get(circleId2);
     
+    while (num_circles%2 == 0 && num_circles != 2
+      && (abs(circle1.posicion-circle2.posicion) == int(num_circles/2)-1
+          || abs(circle1.posicion-circle2.posicion) == int(num_circles/2)
+          || abs(circle1.posicion-circle2.posicion) == int(num_circles/2)+1)){
+      
+      circleId1 = int(random(0, num_circles));
+      circleId2 = int(random(0, num_circles));
+      
+      circle1 = items.get(circleId1);
+      circle2 = items.get(circleId2);
+    
+    }
+    
     // Asigna el centro y diametro de la orbita en la que van a rotar
             
     centroX = (circle1.xPos + circle2.xPos)/2;
@@ -157,8 +170,8 @@ void draw() {
     
     OrbitItem orbit = new OrbitItem(centroX, centroY, diametro, hue);
     
-    circle1.setFinal(centroX, centroY, circle2.c);
-    circle2.setFinal(centroX, centroY, circle1.c);
+    circle1.setFinal(centroX, centroY, circle2.c, circle2.getPosicion());
+    circle2.setFinal(centroX, centroY, circle1.c, circle1.getPosicion());
     
     // Activa la rotacion
         
@@ -241,9 +254,13 @@ class CircleItem{
   private float[] c;
   private float[] cEnd;
   
+  // Posicion actual del circulo
+  
+  private int posicion = 0;
+  
   // Comprobante si ya hizo la transicion
   
-  public boolean check = true;  
+  public boolean check = true;
   
   // Para dibujar cada circulo
   
@@ -255,6 +272,8 @@ class CircleItem{
     
     items.add(this);
     
+    this.posicion = items.indexOf(this);
+    
   }
   
   public void display(){
@@ -264,25 +283,28 @@ class CircleItem{
     
   }
   
-  public void setFinal(float centroX, float centroY, float[] new_c){
+  public void setFinal(float centroX, float centroY, float[] new_c, int new_posicion){
+    
+    this.posicion = new_posicion;
+    
 
-   this.cEnd = new_c.clone();
+    this.cEnd = new_c.clone();
    
-   this.centroX = centroX;
-   this.centroY = centroY;
-   
-   this.angulo = atan2(this.yPos - this.centroY, this.xPos - this.centroX);
-      
-   this.radio = dist(this.xPos, this.yPos, this.centroX, this.centroY);
-   
-   this.check = true;
-   
-   this.saltoH = ((this.cEnd[0] - this.c[0]) / float(steps)) * speed;
+    this.centroX = centroX;
+    this.centroY = centroY;
+     
+    this.angulo = atan2(this.yPos - this.centroY, this.xPos - this.centroX);
+    
+    this.radio = dist(this.xPos, this.yPos, this.centroX, this.centroY);
+     
+    this.check = true;
+     
+    this.saltoH = ((this.cEnd[0] - this.c[0]) / float(steps)) * speed;
    
   }
   
   public void actualizaColor(){
-        
+            
     if (this.c[0] != this.cEnd[0]){
       
       if (this.c[0] + this.saltoH > this.cEnd[0]) {
@@ -353,6 +375,12 @@ class CircleItem{
   this.xPos = xCercano;
   this.yPos = yCercano;
   
+  }
+  
+  public int getPosicion(){
+    
+    return this.posicion;
+    
   }
   
 }
