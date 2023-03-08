@@ -14,12 +14,16 @@ int prevCircleId2;
 
 int num_circles = 12;
 
+// Radio inicial
+
+float radio = 200;
+
 // Se inicializan los colores
 
 int saturation = 60;
 int brightness = 80;
 
-float [][] colors = new float[num_circles][];
+float [][] colors = new float[num_circles][3];
 
 int colorsIterator = 0;
 
@@ -30,6 +34,8 @@ ArrayList <CircleItem> items = new ArrayList <CircleItem> ();
 // Se crea la lista donde se guardaran las orbitas
 
 ArrayList <OrbitItem> orbitItems = new ArrayList <OrbitItem> ();
+
+int [][] posicionesIniciales = new int[num_circles][];
 
 // Numero de pasos para dar la vuelta para cada par de circulos
 
@@ -44,6 +50,9 @@ float speed = 0;
 float centroX = 0;
 float centroY = 0;
 float diametro = 0;
+
+int checkDescuadre = 0;
+int checkDescuadre1 = 0;
 
 void setup() {
   
@@ -61,16 +70,26 @@ void setup() {
   
   // Creacion circulos
   
+  int counterPos = 0;
+  
   for(int i=0; i < 360 ; i += int(360/num_circles)){
             
-    int xPos = int(200*cos(i*(PI/180)));
-    int yPos = int(200*sin(i*(PI/180)));
+    int xPos = int(radio*cos(i*(PI/180)));
+    int yPos = int(radio*sin(i*(PI/180)));
     
+    int[] temp = new int[] {xPos, yPos};
+            
+    posicionesIniciales[counterPos] = (temp);
+    
+    counterPos++;
+        
     CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]);
     
     colorsIterator++;
     
   }
+  
+  frameRate(1000);
 }
 
 void draw() {
@@ -85,6 +104,9 @@ void draw() {
   
   if (cur_rotating == false){
     
+    checkDescuadre ++;
+    checkDescuadre1 ++;
+    
     // Escoge que par de circulos van a rotar
         
     circleId1 = int(random(0, num_circles));
@@ -98,16 +120,26 @@ void draw() {
         // O si son el par anterior
         || ((circleId1 == prevCircleId1 && circleId2 == prevCircleId2) || (circleId1 == prevCircleId2 && circleId2 == prevCircleId1))
       ){
-      //println("resta: " + abs(circleId1 - circleId2));
+
       circleId1 = int(random(0, num_circles));
       circleId2 = int(random(0, num_circles));
       
     }
     
+    if (checkDescuadre == 5){
+            
+      for (CircleItem item : items){
+        
+        item.ajustaPosicion();
+        
+      }
+      
+      checkDescuadre = 0;
+      
+    }
+    
     speed = random(0.5, 4);
-    
-    println(speed);
-    
+        
     CircleItem circle1 = items.get(circleId1);
     CircleItem circle2 = items.get(circleId2);
     
@@ -293,6 +325,34 @@ class CircleItem{
       
     }
     
+  }
+  
+  public void ajustaPosicion(){
+    
+    int xCercano = this.xPos;
+    
+    int yCercano = this.yPos;
+    
+    float distCercana = radio;
+      
+    for (int[] posCorrecta : posicionesIniciales){
+      
+      float distActual = dist(this.xPos, this.yPos, posCorrecta[0], posCorrecta[1]);
+      
+      if (distActual < distCercana || distActual == 0){
+        
+        distCercana = distActual;
+        
+        xCercano = posCorrecta[0];
+        yCercano = posCorrecta[1];
+        
+      }
+    
+    }
+    
+  this.xPos = xCercano;
+  this.yPos = yCercano;
+  
   }
   
 }
