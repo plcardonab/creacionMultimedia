@@ -422,7 +422,7 @@ public class OrbitItem{
   public float sat = 0;
   
   public float alpha = 0;
-  public float alphaChange = 5;
+  public float alphaChange = 600/speed;
     
   public OrbitItem(float centroX, float centroY, float radio, float hue){
     
