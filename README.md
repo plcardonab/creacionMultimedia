@@ -15,4 +15,4 @@ El proyecto fue inspirado por la siguiente imagen, creada por el artista Dave Wh
 ## Video
 En el video a continuación se presenta el resultado final del proyecto:  
 
-https://user-images.githubusercontent.com/55595765/223612170-a6dd8c0b-993b-47e2-89b2-2f785ee03b79.mp4
+[Demo](https://user-images.githubusercontent.com/47161530/223832752-644f025f-7c1e-483d-9a23-08bf3d24945a.webm)
