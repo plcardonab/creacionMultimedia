@@ -98,7 +98,7 @@ void draw() {
         // O si son el par anterior
         || ((circleId1 == prevCircleId1 && circleId2 == prevCircleId2) || (circleId1 == prevCircleId2 && circleId2 == prevCircleId1))
       ){
-      
+      //println("resta: " + abs(circleId1 - circleId2));
       circleId1 = int(random(0, num_circles));
       circleId2 = int(random(0, num_circles));
       
@@ -146,6 +146,10 @@ void draw() {
     circle1.actualiza();
     circle2.actualiza();
     
+    // Cambia el alpha de las orbitas
+    OrbitItem orbit = orbitItems.get(orbitItems.size()-1);
+    orbit.changeOpacity();
+    
     // Si ya termino la rotacion, escoge otro par de circulos
     
     if (circle1.check == false && circle2.check == false){
@@ -154,6 +158,7 @@ void draw() {
       prevCircleId2 = circleId2;
             
       cur_rotating = false;
+      delay(500);
       
       // Elimina la orbita
       
@@ -303,6 +308,9 @@ public class OrbitItem{
   public float saltoS = 0;
   
   public float sat = 0;
+  
+  public float alpha = 0;
+  public float alphaChange = 2.84444;
     
   public OrbitItem(float centroX, float centroY, float radio, float hue){
     
@@ -318,12 +326,19 @@ public class OrbitItem{
     
   }
   
+  public void changeOpacity() {
+    alpha = alpha + alphaChange;
+    if (alpha > 255 || alpha < 0) {
+      alphaChange *= -1;
+    }
+  }
+  
   public void display(){
     
     this.sat += this.saltoS;
         
     strokeWeight(3);
-    stroke(this.hue, this.sat, brightness);
+    stroke(this.hue, this.sat, brightness, alpha);
     noFill();
         
     circle(centroX, centroY, radio);
