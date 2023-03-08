@@ -1,3 +1,8 @@
+// Estrellas
+
+int NUM_STARS = 50;
+ArrayList<Star> stars = new ArrayList<Star>();
+
 // Si hay algún par de círculos rotando actualmente
 
 boolean cur_rotating = false;
@@ -62,6 +67,13 @@ void setup() {
   
   size(800, 800, P2D);
   
+  // Creacion estrellas
+  
+  for (int i = 0; i < NUM_STARS; i++) {
+        
+        stars.add(new Star(noise(width), noise(height)));
+  }
+  
   // Creacion de los colores
   
   for (int i=0; i < num_circles; i++) {
@@ -97,6 +109,21 @@ void draw() {
   background(0);
   
   // Parte del centro
+  
+  float acc = map(mouseX, 0, width, 0.005f, 0.2f);
+    
+  for (Star star : stars) {
+      
+      star.corre();
+      star.update(acc);
+  }
+  
+  stars.removeIf(star -> !star.is_active());
+  
+  while (stars.size() < NUM_STARS) {
+      
+      stars.add(new Star(random(width), random(height)));
+  }
   
   translate(width/2, height/2);
   
@@ -300,6 +327,8 @@ class CircleItem{
   }
   
   public void display(){
+    
+    noStroke();
         
     fill(this.c, saturation, brightness);
     circle(this.xPos, this.yPos, 40);
@@ -422,7 +451,7 @@ public class OrbitItem{
   public float sat = 0;
   
   public float alpha = 0;
-  public float alphaChange = 600/speed;
+  public float alphaChange = 550/speed;
     
   public OrbitItem(float centroX, float centroY, float radio, float hue){
     
@@ -462,4 +491,49 @@ public class OrbitItem{
     noStroke();
   
   }
+}
+
+class Star {
+
+    PVector pos;
+    PVector prev_pos;
+    PVector vel;
+    float ang;
+    
+    Star(float x, float y) {
+        
+        pos = new PVector(x, y);
+        prev_pos = new PVector(x, y);
+        vel = new PVector(0, 0);
+        ang = atan2(y - (height/2), x - (width/2));
+    }
+    
+    boolean is_active() {
+        
+        return on_screen(prev_pos.x, prev_pos.y);
+    }
+    
+    void update(float acc) {
+        
+        vel.x += cos(ang) * acc;
+        vel.y += sin(ang) * acc;
+        
+        prev_pos.x = pos.x;
+        prev_pos.y = pos.y;
+        
+        pos.x += vel.x;
+        pos.y += vel.y;
+    }
+    
+    void corre() {
+      
+        stroke(random(255), random(255), random(255));
+        strokeWeight(3);
+        line(pos.x, pos.y, prev_pos.x, prev_pos.y);
+    }
+}
+
+boolean on_screen(float x, float y) {
+    
+    return x >= 0 && x <= width && y >= 0 && y <= height;
 }
