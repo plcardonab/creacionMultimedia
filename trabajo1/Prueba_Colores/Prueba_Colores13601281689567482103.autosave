@@ -65,7 +65,7 @@ void setup() {
   // Creacion de los colores
   
   for (int i=0; i < num_circles; i++) {
-    colors[i] = int(random(0, 359));
+    colors[i] = random(0, 359);
   }
   
   // Creacion circulos
@@ -83,7 +83,7 @@ void setup() {
     
     counterPos++;
         
-    CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]+1-1);
+    CircleItem ci = new CircleItem(xPos, yPos, colors[(colorsIterator)%colors.length]);
     
     colorsIterator++;
     
@@ -103,39 +103,6 @@ void draw() {
   // Si no hay nada rotando actualmente
   
   if (cur_rotating == false){
-    
-    float temp = random(0, 1);
-    
-    println(temp);
-    
-    if (temp <= 0.2) {
-      
-      speed = steps/4;
-      
-    }
-    else if (temp <= 0.4) {
-      
-      speed = steps/3;
-      
-    }
-    
-    else if (temp <= 0.6) {
-      
-      speed = steps/2;
-      
-    }
-    
-    else if (temp <= 0.8) {
-      
-      speed = steps;
-      
-    }
-    
-    else {
-      
-      speed = steps*2;
-      
-    }
     
     checkDescuadre ++;
     checkDescuadre1 ++;
@@ -158,6 +125,25 @@ void draw() {
       circleId2 = int(random(0, num_circles));
       
     }
+    
+    if (checkDescuadre == 5){
+            
+      for (CircleItem item : items){
+        
+        item.ajustaPosicion();
+        
+      }
+      
+      checkDescuadre = 0;
+      
+    }
+    
+    float temp = random();
+    
+    if (temop 
+      
+    
+    speed = int(random(0.5, 4)*float(steps));
         
     CircleItem circle1 = items.get(circleId1);
     CircleItem circle2 = items.get(circleId2);
@@ -166,8 +152,6 @@ void draw() {
       && (abs(circle1.posicion-circle2.posicion) == int(num_circles/2)-1
           || abs(circle1.posicion-circle2.posicion) == int(num_circles/2)
           || abs(circle1.posicion-circle2.posicion) == int(num_circles/2)+1)){
-            
-      println("Entra con", circle1.posicion, "y con", circle2.posicion);
       
       circleId1 = int(random(0, num_circles));
       circleId2 = int(random(0, num_circles));
@@ -185,14 +169,14 @@ void draw() {
     
     // Asigna el tono promedio entre los dos circulos
     
-    float hue = (circle1.c + circle2.c) / 2;
+    float hue = (circle1.c[0] + circle2.c[0]) / 2;
     
     // Crea la orbita
     
     OrbitItem orbit = new OrbitItem(centroX, centroY, diametro, hue);
     
-    circle1.setFinal(centroX, centroY, circle2.c);
-    circle2.setFinal(centroX, centroY, circle1.c);
+    circle1.setFinal(centroX, centroY, circle2.c, circle2.getPosicion());
+    circle2.setFinal(centroX, centroY, circle1.c, circle1.getPosicion());
     
     // Activa la rotacion
         
@@ -273,8 +257,7 @@ class CircleItem{
   // Colores
   
   private float c;
-  private float cEnd;
-  private float cInit;
+  private float[] colors;
   
   // Posicion actual del circulo
   
@@ -290,8 +273,7 @@ class CircleItem{
         
     this.xPos = xPos;
     this.yPos = yPos;
-    this.c = c+1-1;
-    this.cInit = c+1-1;
+    this.c = c;
     
     items.add(this);
     
@@ -306,9 +288,9 @@ class CircleItem{
     
   }
   
-  public void setFinal(float centroX, float centroY, float new_c){    
-
-    this.cEnd = new_c+1-1;
+  public void setFinal(float centroX, float centroY, float new_c, int new_posicion){
+    
+    this.posicion = new_posicion;
    
     this.centroX = centroX;
     this.centroY = centroY;
@@ -319,35 +301,42 @@ class CircleItem{
      
     this.check = true;
      
-    this.saltoH = (this.cEnd - this.c) / float(speed);
+    this.saltoH = (new_c - this.c) / speed;
+  
+    for (int i=0, i<steps, i++){
+      
+      this.colors[i] = this.c + i*this.saltoH;
+      
+    }
     
+    this.colors.removeIf(i -> i > new_posicion);
+    this.colors[this.colors.size()-1] = new_posicion+1-1;
+   
   }
   
   public void actualizaColor(){
-    
-    if (this.c != this.cEnd){
+            
+    if (this.c[0] != this.cEnd[0]){
       
-      if (this.c + this.saltoH > this.cEnd) {
-        this.c = this.cEnd;
+      if (this.c[0] + this.saltoH > this.cEnd[0]) {
+        this.c[0] = this.cEnd[0];
       }
       
       else {
         
-        this.c += this.saltoH;
+        this.c[0] += this.saltoH;
         
       }
       
     }
     
-    //this.c = lerpColor(color(this.cInit, saturation, brightness), color(this.cEnd, saturation, brightness), this.counter*this.saltoH/100);
-        
   }
   
   // Calcula la pos de X y Y actuales
   
   public void actualizaPosicion(){
     
-    this.angulo += PI/speed;
+    this.angulo += PI/steps;
             
     this.xPos = int(this.centroX + this.radio*cos(this.angulo));
     this.yPos = int(this.centroY + this.radio*sin(this.angulo));
@@ -361,13 +350,11 @@ class CircleItem{
     
     this.counter ++;
     
-    if (this.counter == speed){
+    if (this.counter == steps){
             
       this.counter = 0;
       
       this.check = false;
-      
-      this.ajustaPosicion();
       
     }
     
@@ -380,21 +367,17 @@ class CircleItem{
     int yCercano = this.yPos;
     
     float distCercana = radio;
-    
-    int indexCercano = 0;
       
-    for (int i=0; i<posicionesIniciales.length; i++){
+    for (int[] posCorrecta : posicionesIniciales){
       
-      float distActual = dist(this.xPos, this.yPos, posicionesIniciales[i][0], posicionesIniciales[i][1]);
+      float distActual = dist(this.xPos, this.yPos, posCorrecta[0], posCorrecta[1]);
       
       if (distActual < distCercana || distActual == 0){
         
         distCercana = distActual;
         
-        xCercano = posicionesIniciales[i][0];
-        yCercano = posicionesIniciales[i][1];
-        
-        indexCercano = i;
+        xCercano = posCorrecta[0];
+        yCercano = posCorrecta[1];
         
       }
     
@@ -403,8 +386,12 @@ class CircleItem{
   this.xPos = xCercano;
   this.yPos = yCercano;
   
-  this.posicion = indexCercano;
+  }
   
+  public int getPosicion(){
+    
+    return this.posicion;
+    
   }
   
 }
@@ -422,7 +409,7 @@ public class OrbitItem{
   public float sat = 0;
   
   public float alpha = 0;
-  public float alphaChange = 5;
+  public float alphaChange = 2.84444;
     
   public OrbitItem(float centroX, float centroY, float radio, float hue){
     
@@ -432,21 +419,17 @@ public class OrbitItem{
     
     this.hue = hue;
     
-    this.saltoS = float(saturation) / float(speed);
+    this.saltoS = (float(saturation) / float(steps)) * speed;
     
     orbitItems.add(this);
     
   }
   
   public void changeOpacity() {
-    
-    this.alpha += this.alphaChange;
-    
-    if (this.alpha > 255 || this.alpha < 0) {
-      this.alphaChange *= -1;
-      
+    alpha = alpha + alphaChange;
+    if (alpha > 255 || alpha < 0) {
+      alphaChange *= -1;
     }
-    
   }
   
   public void display(){
@@ -454,7 +437,7 @@ public class OrbitItem{
     this.sat += this.saltoS;
         
     strokeWeight(3);
-    stroke(this.hue, this.sat, brightness, this.alpha);
+    stroke(this.hue, this.sat, brightness, alpha);
     noFill();
         
     circle(centroX, centroY, radio);
