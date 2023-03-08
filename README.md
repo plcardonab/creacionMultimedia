@@ -15,7 +15,7 @@ El proyecto fue inspirado por la siguiente imagen, creada por el artista Dave Wh
 ## Adaptación
 
 Para la generación del fondo se utlizó una adaptación a Java del código del video
-![Fondo]https://www.youtube.com/watch?v=p0I5bNVcYP8&t=391s
+https://www.youtube.com/watch?v=p0I5bNVcYP8
 
 ## Video
 En el video a continuación se presenta el resultado final del proyecto:  
