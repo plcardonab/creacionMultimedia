@@ -356,7 +356,11 @@ class CircleItem{
     
     if (this.c != this.cEnd){
       
-      if (this.c + this.saltoH > this.cEnd) {
+      if (this.c < this.cEnd && this.c + this.saltoH > this.cEnd) {
+        this.c = this.cEnd;
+      }
+      
+      else if (this.c > this.cEnd && this.c + this.saltoH < this.cEnd) {
         this.c = this.cEnd;
       }
       
@@ -451,7 +455,7 @@ public class OrbitItem{
   public float sat = 0;
   
   public float alpha = 0;
-  public float alphaChange = 550/speed;
+  public float alphaChange = 512 / float(speed);
     
   public OrbitItem(float centroX, float centroY, float radio, float hue){
     
